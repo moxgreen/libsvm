@@ -5,6 +5,11 @@ OS = $(shell uname)
 
 all: svm-train svm-predict svm-scale
 
+DEST    ?= $(BIOINFO_ROOT)/binaries/$(BIOINFO_HOST)/local/
+
+install: svm-predict svm-train svm-scale
+	$(foreach T,$^,	install -D -s $(T) $(DEST)/bin/$(T);)
+
 lib: svm.o
 	if [ "$(OS)" = "Darwin" ]; then \
 		SHARED_LIB_FLAG="-dynamiclib -Wl,-install_name,libsvm.so.$(SHVER)"; \
