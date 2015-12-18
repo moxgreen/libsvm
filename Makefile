@@ -9,6 +9,10 @@ DEST    ?= $(BIOINFO_ROOT)/binaries/$(BIOINFO_HOST)/local/
 
 install: svm-predict svm-train svm-scale
 	$(foreach T,$^,	install -D -s $(T) $(DEST)/bin/$(T);)
+	cd tools;\
+	for i in *.py; do\
+		link_install $$i $(BIOINFO_ROOT)/local/bin/$$i;\
+	done
 
 lib: svm.o
 	if [ "$(OS)" = "Darwin" ]; then \
