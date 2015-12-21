@@ -12,11 +12,11 @@ if len(sys.argv) <= 1:
 
 is_win32 = (sys.platform == 'win32')
 if not is_win32:
-	svmscale_exe = "../svm-scale"
-	svmtrain_exe = "../svm-train"
-	svmpredict_exe = "../svm-predict"
-	grid_py = "./grid.py"
-	gnuplot_exe = "/usr/bin/gnuplot"
+	svmscale_exe = "svm-scale"
+	svmtrain_exe = "svm-train"
+	svmpredict_exe = "svm-predict"
+	grid_py = "svm-grid"
+	gnuplot_exe = "gnuplot"
 else:
         # example for windows
 	svmscale_exe = r"..\windows\svm-scale.exe"
@@ -25,11 +25,11 @@ else:
 	gnuplot_exe = r"c:\tmp\gnuplot\binary\pgnuplot.exe"
 	grid_py = r".\grid.py"
 
-assert os.path.exists(svmscale_exe),"svm-scale executable not found"
-assert os.path.exists(svmtrain_exe),"svm-train executable not found"
-assert os.path.exists(svmpredict_exe),"svm-predict executable not found"
-assert os.path.exists(gnuplot_exe),"gnuplot executable not found"
-assert os.path.exists(grid_py),"grid.py not found"
+#assert os.path.exists(svmscale_exe),"svm-scale executable not found"
+#assert os.path.exists(svmtrain_exe),"svm-train executable not found"
+#assert os.path.exists(svmpredict_exe),"svm-predict executable not found"
+#assert os.path.exists(gnuplot_exe),"gnuplot executable not found"
+#assert os.path.exists(grid_py),"grid.py not found"
 
 train_pathname = sys.argv[1]
 assert os.path.exists(train_pathname),"training file not found"
@@ -62,7 +62,7 @@ c,g,rate = map(float,last_line.split())
 
 print('Best c={0}, g={1} CV rate={2}'.format(c,g,rate))
 
-cmd = '{0} -c {1} -g {2} "{3}" "{4}"'.format(svmtrain_exe,c,g,scaled_file,model_file)
+cmd = '{0} -b 1 -c {1} -g {2} "{3}" "{4}"'.format(svmtrain_exe,c,g,scaled_file,model_file)
 print('Training...')
 Popen(cmd, shell = True, stdout = PIPE).communicate()
 
@@ -72,7 +72,7 @@ if len(sys.argv) > 2:
 	print('Scaling testing data...')
 	Popen(cmd, shell = True, stdout = PIPE).communicate()	
 
-	cmd = '{0} "{1}" "{2}" "{3}"'.format(svmpredict_exe, scaled_test_file, model_file, predict_test_file)
+	cmd = '{0} -b 1 "{1}" "{2}" "{3}"'.format(svmpredict_exe, scaled_test_file, model_file, predict_test_file)
 	print('Testing...')
 	Popen(cmd, shell = True).communicate()	
 
