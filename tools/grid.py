@@ -18,8 +18,8 @@ class GridOption:
 	def __init__(self, dataset_pathname, options):
 		dirname = os.path.dirname(__file__)
 		if sys.platform != 'win32':
-			self.svmtrain_pathname = os.path.join(dirname, '../svm-train')
-			self.gnuplot_pathname = '/usr/bin/gnuplot'
+			self.svmtrain_pathname = 'svm-train'
+			self.gnuplot_pathname = 'gnuplot'
 		else:
 			# example for windows
 			self.svmtrain_pathname = os.path.join(dirname, r'..\windows\svm-train.exe')
@@ -90,17 +90,12 @@ class GridOption:
 			i = i + 1
 
 		self.pass_through_string = ' '.join(pass_through_options)
-		if not os.path.exists(self.svmtrain_pathname):
-			raise IOError('svm-train executable not found')
 		if not os.path.exists(self.dataset_pathname):
 			raise IOError('dataset not found')
 		if self.resume_pathname and not os.path.exists(self.resume_pathname):
 			raise IOError('file for resumption not found')
 		if not self.grid_with_c and not self.grid_with_g:
 			raise ValueError('-log2c and -log2g should not be null simultaneously')
-		if self.gnuplot_pathname and not os.path.exists(self.gnuplot_pathname):
-			sys.stderr.write('gnuplot executable not found\n')
-			self.gnuplot_pathname = None
 
 def redraw(db,best_param,gnuplot,options,tofile=False):
 	if len(db) == 0: return
