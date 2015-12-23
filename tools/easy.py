@@ -3,8 +3,16 @@
 import sys
 import os
 from subprocess import *
+from optparse import OptionParser
 
-if len(sys.argv) <= 1:
+usage = 'Usage: {0} training_file [testing_file]'.format(sys.argv[0])
+parser = OptionParser(usage=usage)
+parser.add_option('-v', '--verbose', dest='verbose', action='store_true', default=False, help='verbose [default: %default]')
+parser.add_option('-d', '--nodisplay', dest='nodisplay', action='store_true', default=False, help='do non use the display to show the plot [default: %default]')
+
+options, args = parser.parse_args()
+
+if len(args) == 0 or len(args) > 2:
 	print('Usage: {0} training_file [testing_file]'.format(sys.argv[0]))
 	raise SystemExit
 
@@ -46,11 +54,16 @@ if len(sys.argv) > 2:
 	predict_test_file = file_name + ".predict"
 
 cmd = '{0} -s "{1}" "{2}" > "{3}"'.format(svmscale_exe, range_file, train_pathname, scaled_file)
-print('Scaling training data...')
+if options.verbose:
+    print('Scaling training data...')
 Popen(cmd, shell = True, stdout = PIPE).communicate()	
 
-cmd = '{0} -svmtrain "{1}" -gnuplot "{2}" "{3}"'.format(grid_py, svmtrain_exe, gnuplot_exe, scaled_file)
-print('Cross validation...')
+gnuplot =  gnuplot_exe
+if options.nodisplay:
+    gnuplot = "null"
+cmd = '{0} -svmtrain "{1}" -gnuplot "{2}" "{3}"'.format(grid_py, svmtrain_exe, gnuplot, scaled_file)
+if options.verbose:
+    print('Cross validation...')
 f = Popen(cmd, shell = True, stdout = PIPE).stdout
 
 line = ''
@@ -63,17 +76,22 @@ c,g,rate = map(float,last_line.split())
 print('Best c={0}, g={1} CV rate={2}'.format(c,g,rate))
 
 cmd = '{0} -b 1 -c {1} -g {2} "{3}" "{4}"'.format(svmtrain_exe,c,g,scaled_file,model_file)
-print('Training...')
+if options.verbose:
+    print('Training...')
 Popen(cmd, shell = True, stdout = PIPE).communicate()
 
-print('Output model: {0}'.format(model_file))
+if options.verbose:
+    print('Output model: {0}'.format(model_file))
 if len(sys.argv) > 2:
 	cmd = '{0} -r "{1}" "{2}" > "{3}"'.format(svmscale_exe, range_file, test_pathname, scaled_test_file)
-	print('Scaling testing data...')
+        if options.verbose:
+            print('Scaling testing data...')
 	Popen(cmd, shell = True, stdout = PIPE).communicate()	
 
 	cmd = '{0} -b 1 "{1}" "{2}" "{3}"'.format(svmpredict_exe, scaled_test_file, model_file, predict_test_file)
-	print('Testing...')
+        if options.verbose:
+            print('Testing...')
 	Popen(cmd, shell = True).communicate()	
 
-	print('Output prediction: {0}'.format(predict_test_file))
+        if options.verbose:
+            print('Output prediction: {0}'.format(predict_test_file))
