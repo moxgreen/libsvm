@@ -48,7 +48,7 @@ model_file = file_name + ".model"
 range_file = file_name + ".range"
 
 if len(args) > 1:
-	test_pathname = args[2]
+	test_pathname = args[1]
 	file_name = os.path.split(test_pathname)[1]
 	assert os.path.exists(test_pathname),"testing file not found"
 	scaled_test_file = file_name + ".scale"
